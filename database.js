@@ -43,6 +43,12 @@ function getUserByLogin(username, password, callback) {
   });
 }
 
+function getUser(id, callback) {
+  db.get("select * from users where id = ?", [id], function (err, row) {
+    callback(row);
+  })
+}
+
 function insertFriend(from_userid, to_userid, callback) {
   confirmFriendIsExists(from_userid, to_userid, function (result) {
     if (result == undefined) {
@@ -66,6 +72,20 @@ function getFriends(from_userid, callback) {
     });
 }
 
+function insertMessage(from_userid, to_userid, message, callback) {
+  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
+    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message]);
+    db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
+      callback(row);
+    })
+  });
+}
+
+function getMessageById(from_userid, to_userid, callback) {
+  db.run("SELECT * FROM user_message where from_userid =  ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
+    callback(row);
+  })
+}
 
 function confirmUserIsExists(username, callback) {
   db.get("select * from users where username = ?", [username], function (err, row) {
@@ -84,3 +104,6 @@ exports.createChatDatabase = createChatDatabase;
 exports.insertFriend = insertFriend;
 exports.getFriends = getFriends;
 exports.getUserByLogin = getUserByLogin;
+exports.getUser = getUser;
+exports.insertMessage = insertMessage;
+exports.getMessageById = getMessageById;
