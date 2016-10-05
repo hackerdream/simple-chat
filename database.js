@@ -53,6 +53,14 @@ function insertFriend(from_userid, to_userid, callback) {
   });
 }
 
+function getFriends(from_userid,callback) {
+  db.all("SELECT * FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
+    function (err, row) {
+      callback(row)
+  });
+}
+
+
 function confirmUserIsExists(username, callback) {
   db.get("select * from users where username = ?", [username], function (err, row) {
     callback(row);
@@ -68,3 +76,4 @@ function confirmFriendIsExists(from_userid, to_userid, callback) {
 exports.insertUser = insertUser;
 exports.createChatDatabase = createChatDatabase;
 exports.insertFriend = insertFriend;
+exports.getFriends = getFriends;
