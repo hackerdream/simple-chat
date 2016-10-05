@@ -37,6 +37,12 @@ function insertUser(username, password, name, portrait) {
   });
 }
 
+function getUserByLogin(username, password, callback) {
+  db.get(" select * from users where username = ? AND password = ?", [username, password], function (err, row) {
+    callback(row);
+  });
+}
+
 function insertFriend(from_userid, to_userid, callback) {
   confirmFriendIsExists(from_userid, to_userid, function (result) {
     if (result == undefined) {
@@ -53,11 +59,11 @@ function insertFriend(from_userid, to_userid, callback) {
   });
 }
 
-function getFriends(from_userid,callback) {
+function getFriends(from_userid, callback) {
   db.all("SELECT * FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
     function (err, row) {
       callback(row)
-  });
+    });
 }
 
 
@@ -77,3 +83,4 @@ exports.insertUser = insertUser;
 exports.createChatDatabase = createChatDatabase;
 exports.insertFriend = insertFriend;
 exports.getFriends = getFriends;
+exports.getUserByLogin = getUserByLogin;
