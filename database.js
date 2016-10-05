@@ -37,7 +37,21 @@ function insertUser(username, password, name, portrait) {
   });
 }
 
-
+function insertFriend(from_userid, to_userid, callback) {
+  confirmFriendIsExists(from_userid, to_userid, function (result) {
+    if (result == undefined) {
+      db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, from_userid, to_userid], function (err, row) {
+        db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid]);
+        db.get("SELECT * FROM user_friends WHERE rowid = " + this.lastID, function (err, row) {
+          callback(row);
+        })
+      })
+    }
+    else {
+      console.log('you have this friend');
+    }
+  });
+}
 
 function confirmUserIsExists(username, callback) {
   db.get("select * from users where username = ?", [username], function (err, row) {
@@ -45,6 +59,12 @@ function confirmUserIsExists(username, callback) {
   })
 }
 
+function confirmFriendIsExists(from_userid, to_userid, callback) {
+  db.get("select * from user_friends where from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
+    callback(row);
+  })
+}
 
 exports.insertUser = insertUser;
 exports.createChatDatabase = createChatDatabase;
+exports.insertFriend = insertFriend;
