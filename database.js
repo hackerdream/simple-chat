@@ -27,7 +27,22 @@ function createChatDatabase() {
 }
 
 function insertUser(username, password, name, portrait) {
-  db.run("INSERT INTO users VALUES (?,?,?,?,?)", [null, username, password, name, portrait]);
+  confirmUserIsExists(username, function (result) {
+    if (result == undefined) {
+      db.run("INSERT INTO users VALUES (?,?,?,?,?)", [null, username, password, name, portrait]);
+    }
+    else {
+      console.log('username is exists');
+    }
+  });
+}
+
+
+
+function confirmUserIsExists(username, callback) {
+  db.get("select * from users where username = ?", [username], function (err, row) {
+    callback(row);
+  })
 }
 
 
