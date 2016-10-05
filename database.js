@@ -88,19 +88,19 @@ function getMessageById(from_userid, to_userid, callback) {
 }
 
 function confirmUserIsExists(username, callback) {
-  db.get("select * from users where username = ?", [username], function (err, row) {
+  db.get("SELECT * FROM users WHERE username = ?", [username], function (err, row) {
     callback(row);
   })
 }
 
 function confirmFriendIsExists(from_userid, to_userid, callback) {
-  db.get("select * from user_friends where from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
+  db.get("SELECT * FROM user_friends WHERE from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
     callback(row);
   })
 }
 
-exports.insertUser = insertUser;
 exports.createChatDatabase = createChatDatabase;
+exports.insertUser = insertUser;
 exports.insertFriend = insertFriend;
 exports.getFriends = getFriends;
 exports.getUserByLogin = getUserByLogin;
