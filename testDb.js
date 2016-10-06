@@ -57,9 +57,9 @@ function testInsertFriends(next) {
 }
 
 function testInsertMessage(next) {
-  db.insertMessage(1, 2, 'hello', function (row) {
+  db.insertMessage(1, 2, 'xxxxx', 'xxxxx', 'hello', function (row) {
     assertTrue(row.constructor == Object);
-    db.insertMessage(1, 3, 'how are you', function (row) {
+    db.insertMessage(1, 3, 'how are you','xxxxx', 'xxxxx', function (row) {
       assertTrue(row.constructor == Object);
 
       next();
@@ -112,4 +112,4 @@ function testSearchUser(next) {
 }
 
 chain([createDatabase, testUserInsert, testInsertFriends, testInsertMessage,
-  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser,testSearchUser]);
+  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser, testSearchUser]);
