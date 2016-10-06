@@ -26,13 +26,14 @@ function createChatDatabase() {
   )
 }
 
-function insertUser(username, password, name, portrait) {
-  confirmUserIsExists(username, function (result) {
+function insertUser(username, password, name, portrait, callback) {
+  confirmUserExists(username, function (result) {
     if (result == undefined) {
-      db.run("INSERT INTO users VALUES (?,?,?,?,?)", [null, username, password, name, portrait]);
-    }
-    else {
-      console.log('username is exists');
+      db.run("INSERT INTO users VALUES (?,?,?,?,?)", [null, username, password, name, portrait], function (err, row) {
+        callback(true);
+      });
+    } else {
+      callback(false);
     }
   });
 }
@@ -50,17 +51,17 @@ function getUser(id, callback) {
 }
 
 function insertFriend(from_userid, to_userid, callback) {
-  confirmFriendIsExists(from_userid, to_userid, function (result) {
+  confirmFriendExists(from_userid, to_userid, function (result) {
     if (result == undefined) {
       db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, from_userid, to_userid], function (err, row) {
-        db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid]);
-        db.get("SELECT * FROM user_friends WHERE rowid = " + this.lastID, function (err, row) {
-          callback(row);
-        })
+        db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid], function (err, row) {
+          db.get("SELECT * FROM user_friends WHERE rowid = " + this.lastID, function (err, row) {
+            callback(true, row);
+          });
+        });
       })
-    }
-    else {
-      console.log('you have this friend');
+    } else {
+      callback(false);
     }
   });
 }
@@ -68,32 +69,33 @@ function insertFriend(from_userid, to_userid, callback) {
 function getFriends(from_userid, callback) {
   db.all("SELECT * FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
     function (err, row) {
-      callback(row)
+      callback(row);
     });
 }
 
 function insertMessage(from_userid, to_userid, message, callback) {
   db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
-    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message]);
-    db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
-      callback(row);
-    })
+    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message], function (err, row) {
+      db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
+        callback(row);
+      });
+    });
   });
 }
 
-function getMessageById(from_userid, to_userid, callback) {
+function getMessageOfSession(from_userid, to_userid, callback) {
   db.run("SELECT * FROM user_message where from_userid =  ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
     callback(row);
-  })
+  });
 }
 
-function confirmUserIsExists(username, callback) {
+function confirmUserExists(username, callback) {
   db.get("SELECT * FROM users WHERE username = ?", [username], function (err, row) {
     callback(row);
   })
 }
 
-function confirmFriendIsExists(from_userid, to_userid, callback) {
+function confirmFriendExists(from_userid, to_userid, callback) {
   db.get("SELECT * FROM user_friends WHERE from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
     callback(row);
   })
@@ -106,4 +108,4 @@ exports.getFriends = getFriends;
 exports.getUserByLogin = getUserByLogin;
 exports.getUser = getUser;
 exports.insertMessage = insertMessage;
-exports.getMessageById = getMessageById;
+exports.getMessageOfSession = getMessageOfSession;
