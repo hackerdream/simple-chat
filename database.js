@@ -39,13 +39,13 @@ function insertUser(username, password, name, portrait, callback) {
 }
 
 function getUserByLogin(username, password, callback) {
-  db.get(" select * from users where username = ? AND password = ?", [username, password], function (err, row) {
+  db.get(" select username,id,portrait from users where username = ? AND password = ?", [username, password], function (err, row) {
     callback(row);
   });
 }
 
 function getUser(id, callback) {
-  db.get("select * from users where id = ?", [id], function (err, row) {
+  db.get("select username,name,portrait from users where id = ?", [id], function (err, row) {
     callback(row);
   })
 }
@@ -66,8 +66,14 @@ function insertFriend(from_userid, to_userid, callback) {
   });
 }
 
+function searchUser(name, callback) {
+  db.all("SELECT username,name,portrait FROM users WHERE name = ?", [name], function (err, row) {
+    callback(row);
+  })
+}
+
 function getFriends(from_userid, callback) {
-  db.all("SELECT * FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
+  db.all("SELECT username,name,portrait FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
     function (err, row) {
       callback(row);
     });
@@ -90,7 +96,7 @@ function getMessageOfSession(from_userid, to_userid, callback) {
 }
 
 function confirmUserExists(username, callback) {
-  db.get("SELECT * FROM users WHERE username = ?", [username], function (err, row) {
+  db.get("SELECT username FROM users WHERE username = ?", [username], function (err, row) {
     callback(row);
   })
 }
@@ -109,3 +115,4 @@ exports.getUserByLogin = getUserByLogin;
 exports.getUser = getUser;
 exports.insertMessage = insertMessage;
 exports.getMessageOfSession = getMessageOfSession;
+exports.searchUser = searchUser;
