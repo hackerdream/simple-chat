@@ -1,30 +1,103 @@
+require('shelljs/global');
+rm('./chat.db');
+
 var db = require('./database');
 
+function assertTrue(chk) {
+  if (!chk) {
+    throw  new Error();
+  }
+}
 
-db.createChatDatabase();
-db.insertUser('admin', 'password', 'administrator', '/xxxxx/xxx');
+function assertFalse(chk) {
+  if (chk) {
+    throw  new Error();
+  }
+}
 
-db.insertFriend(1, 4, function () {
+function chain(callbacks) {
+  var i = 0;
 
-});
+  function next() {
+    if (i < callbacks.length) {
+      callbacks[i++](next);
+    }
+  }
 
-db.getFriends(1, function (results) {
-  console.log(results);
-});
+  next();
+}
 
+function createDatabase(next) {
+  db.createChatDatabase();
+  next();
+}
 
-db.getUserByLogin('admin', 'password', function (result) {
-  console.log(result);
-});
+function testUserInsert(next) {
+  db.insertUser('admin', 'password', 'administrator', '/xxxxx/xxx', function (success) {
+    assertTrue(success);
+    db.insertUser('admin', 'password', 'administrator', '/xxxxx/xxx', function (success) {
+      assertFalse(success);
+      next();
+    });
+  });
+}
 
-db.getUser(4, function (result) {
-  console.log(result);
-});
+function testInsertFriends(next) {
 
-db.insertMessage(1, 2, "hello", function (result) {
-  console.log(result);
-});
+  db.insertFriend(1, 4, function (success, row) {
+    assertTrue(success);
+    assertTrue(row != undefined);
+    db.insertFriend(1, 4, function (success, row) {
+      assertFalse(success);
+      assertTrue(row == undefined);
 
-db.getMessageById(1, 2, function (results) {
-  console.log(results);
-});
+      next();
+    });
+  });
+}
+
+function testInsertMessage(next) {
+  db.insertMessage(1, 2, 'hello', function (row) {
+    assertTrue(row.constructor == Object);
+    db.insertMessage(1, 3, 'how are you', function (row) {
+      assertTrue(row.constructor == Object);
+
+      next();
+    })
+  })
+}
+
+function testGetMessage(next) {
+  db.getMessageOfSession(1, 2, function (row) {
+    assertTrue(row.constructor == Array);
+
+    next();
+  })
+}
+
+function testGetFriends(next) {
+  db.getFriends(1, function (row) {
+    assertTrue(row.constructor == Array);
+
+    next();
+  })
+}
+
+function testGetUserByLogin(next) {
+  db.getUserByLogin('admin', 'password', function (success) {
+    assertTrue(success);
+
+    next();
+  })
+}
+
+function testGetUser(next) {
+  db.getUser(1, function (row) {
+    assertTrue(row.constructor == Object);
+
+    next();
+  })
+}
+
+chain([createDatabase, testUserInsert, testInsertFriends, testInsertMessage,
+  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser]);
