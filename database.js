@@ -20,7 +20,6 @@ function createChatDatabase() {
     "id INTEGER PRIMARY KEY," +
     "from_userid INTEGER," +
     "to_userid INTEGER," +
-    "portrait VARCHAR(255) NOT NULL," +
     "message VARCHAR(255) NOT NULL," +
     "time DATETIME NOT NULL" +
     ")"
@@ -80,9 +79,9 @@ function getFriends(from_userid, callback) {
     });
 }
 
-function insertMessage(from_userid, to_userid, portrait,message, callback) {
-  db.run("INSERT INTO user_message VALUES(?,?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, portrait, message], function (err, row) {
-    db.run("INSERT INTO user_message VALUES(?,?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid,portrait, message], function (err, row) {
+function insertMessage(from_userid, to_userid, message, callback) {
+  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message], function (err, row) {
+    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
       db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
         callback(row);
       });
