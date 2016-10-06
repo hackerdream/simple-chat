@@ -19,8 +19,8 @@ function createChatDatabase() {
   db.run("CREATE TABLE IF NOT EXISTS user_message(" +
     "id INTEGER PRIMARY KEY," +
     "from_userid INTEGER," +
-    "from_userid_portrait VARCHAR(255) NOT NULL," +
     "to_userid INTEGER," +
+    "from_userid_portrait VARCHAR(255) NOT NULL," +
     "to_userid_portrait VARCHAR(255) NOT NULL," +
     "message VARCHAR(255) NOT NULL," +
     "time DATETIME NOT NULL" +
