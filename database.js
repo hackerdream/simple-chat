@@ -53,8 +53,8 @@ function getUser(id, callback) {
 function insertFriend(from_userid, to_userid, callback) {
   confirmFriendExists(from_userid, to_userid, function (result) {
     if (result == undefined) {
-      db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, from_userid, to_userid], function (err, row) {
-        db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid], function (err, row) {
+      db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid], function (err, row) {
+        db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, from_userid, to_userid], function (err, row) {
           db.get("SELECT * FROM user_friends WHERE rowid = " + this.lastID, function (err, row) {
             callback(true, row);
           });
@@ -74,8 +74,8 @@ function getFriends(from_userid, callback) {
 }
 
 function insertMessage(from_userid, to_userid, message, callback) {
-  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
-    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message], function (err, row) {
+  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message], function (err, row) {
+    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
       db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
         callback(row);
       });
@@ -84,7 +84,7 @@ function insertMessage(from_userid, to_userid, message, callback) {
 }
 
 function getMessageOfSession(from_userid, to_userid, callback) {
-  db.run("SELECT * FROM user_message where from_userid =  ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
+  db.all("SELECT * FROM user_message where from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
     callback(row);
   });
 }
