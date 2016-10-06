@@ -57,9 +57,9 @@ function testInsertFriends(next) {
 }
 
 function testInsertMessage(next) {
-  db.insertMessage(1, 2, 'xxxxx', 'xxxxx', 'hello', function (row) {
+  db.insertMessage(1, 2, 'xxxxx', 'hello', function (row) {
     assertTrue(row.constructor == Object);
-    db.insertMessage(1, 3, 'how are you','xxxxx', 'xxxxx', function (row) {
+    db.insertMessage(1, 3, 'how are you', 'xxxxx', function (row) {
       assertTrue(row.constructor == Object);
 
       next();
