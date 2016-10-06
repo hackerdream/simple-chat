@@ -78,14 +78,16 @@ function testGetMessage(next) {
 function testGetFriends(next) {
   db.getFriends(1, function (row) {
     assertTrue(row.constructor == Array);
+    assertFalse(row.password != undefined);
 
     next();
   })
 }
 
 function testGetUserByLogin(next) {
-  db.getUserByLogin('admin', 'password', function (success) {
-    assertTrue(success);
+  db.getUserByLogin('admin', 'password', function (row) {
+    assertTrue(row.constructor == Object);
+    assertFalse(row.password != undefined);
 
     next();
   })
@@ -94,10 +96,20 @@ function testGetUserByLogin(next) {
 function testGetUser(next) {
   db.getUser(1, function (row) {
     assertTrue(row.constructor == Object);
+    assertFalse(row.password != undefined);
+
+    next();
+  })
+}
+
+function testSearchUser(next) {
+  db.searchUser('hello', function (row) {
+    assertTrue(row.constructor == Array);
+    assertFalse(row.password != undefined);
 
     next();
   })
 }
 
 chain([createDatabase, testUserInsert, testInsertFriends, testInsertMessage,
-  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser]);
+  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser,testSearchUser]);
