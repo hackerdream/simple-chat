@@ -42,12 +42,12 @@ function testUserInsert(next) {
   });
 }
 
-function testInsertFriends(next) {
+function testAddFriend(next) {
 
-  db.insertFriend(1, 4, function (success, row) {
+  db.addFriend(1, 4, function (success, row) {
     assertTrue(success);
     assertTrue(row != undefined);
-    db.insertFriend(1, 4, function (success, row) {
+    db.addFriend(1, 4, function (success, row) {
       assertFalse(success);
       assertTrue(row == undefined);
 
@@ -115,5 +115,5 @@ function testSearchUser(next) {
   })
 }
 
-chain([createDatabase, testUserInsert, testInsertFriends, testInsertMessage,
+chain([createDatabase, testUserInsert, testAddFriend, testInsertMessage,
   testGetMessage, testGetFriends, testGetUserByLogin, testGetUser, testSearchUser]);

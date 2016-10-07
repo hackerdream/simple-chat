@@ -50,7 +50,7 @@ function getUser(id, callback) {
   })
 }
 
-function insertFriend(from_userid, to_userid, callback) {
+function addFriend(from_userid, to_userid, callback) {
   confirmFriendExists(from_userid, to_userid, function (result) {
     if (result == undefined) {
       db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid], function (err, row) {
@@ -109,7 +109,7 @@ function confirmFriendExists(from_userid, to_userid, callback) {
 
 exports.createChatDatabase = createChatDatabase;
 exports.insertUser = insertUser;
-exports.insertFriend = insertFriend;
+exports.addFriend = addFriend;
 exports.getFriends = getFriends;
 exports.getUserByLogin = getUserByLogin;
 exports.getUser = getUser;
