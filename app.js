@@ -1,6 +1,9 @@
 var express = require('express');
 var ejs = require('ejs');
 var path = require('path');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+
 var app = express();
 var login = require('./router/login');
 var chat = require('./router/chat');
@@ -11,6 +14,19 @@ app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+}));
+
+app.use(bodyParser.json({})); // for parsing application/json
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 app.use(login);
 app.use(chat);

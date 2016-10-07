@@ -1,31 +1,20 @@
 var express = require('express');
-var session = require('express-session');
-var bodyParser = require('body-parser');
 
-var login = express();
+var login = express.Router();
 var db = require('../database');
 
-login.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-}));
-
-login.use(bodyParser.json({})); // for parsing application/json
-
-login.use(bodyParser.urlencoded({
-  extended: true
-}));
 
 login.post('/login', function (req, res) {
-  db.getUserByLogin(req.body.username, req.body.password, function (row) {
-    if (row) {
-      req.session.username = row.username;
-      req.session.userid = row.id;
+  db.getUserByLogin(req.body.username, req.body.password, function (user) {
+    if (user) {
+      req.session.username = user.username;
+      req.session.userid = user.id;
       res.redirect('/chat');
     }
     else {
-      res.status(401).send('please input right username or password!\n');
+      res.status(401).send({
+        message: 'please input right username or password!'
+      });
     }
   })
 });
@@ -39,7 +28,9 @@ login.get('/chat', function (req, res) {
     res.render('chat.html')
   }
   else {
-    res.status(401).send('please login!\n');
+    res.status(401).send({
+      message: 'please login!'
+    });
   }
 });
 
