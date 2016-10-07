@@ -21,7 +21,7 @@ login.post('/login', function (req, res) {
   db.getUserByLogin(req.body.username, req.body.password, function (row) {
     if (row) {
       req.session.username = row.username;
-      req.session.id = row.id;
+      req.session.userid = row.id;
       res.redirect('/chat');
     }
     else {
