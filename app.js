@@ -15,6 +15,8 @@ app.set('views', __dirname + '/views');
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+app.use('/dist', express.static(path.join(__dirname, 'dist')));
+
 
 app.use(session({
   secret: 'keyboard cat',
@@ -31,6 +33,6 @@ app.use(bodyParser.urlencoded({
 app.use(login);
 app.use(chat);
 
-app.listen(8080, function () {
-  console.log("http://localhost:8080");
+app.listen(8000, function () {
+  console.log("http://localhost:3000");
 });
