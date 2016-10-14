@@ -45,7 +45,7 @@ function getUserByLogin(username, password, callback) {
 }
 
 function getUser(id, callback) {
-  db.get("select username,name,portrait from users where id = ?", [id], function (err, row) {
+  db.get("select id,username,name,portrait from users where id = ?", [id], function (err, row) {
     callback(row);
   })
 }
@@ -73,26 +73,26 @@ function searchUser(name, callback) {
 }
 
 function getFriends(from_userid, callback) {
-  db.all("SELECT username,name,portrait FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
+  db.all("SELECT username,name,portrait,id FROM users WHERE id IN (SELECT to_userid FROM user_friends WHERE from_userid = ?)", [from_userid],
     function (err, row) {
       callback(row);
     });
 }
 
 function insertMessage(from_userid, to_userid, message, callback) {
-  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, to_userid, from_userid, message], function (err, row) {
-    db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
-      db.get("SELECT * FROM user_message WHERE rowid = " + this.lastID, function (err, row) {
-        callback(row);
-      });
-    });
+  db.run("INSERT INTO user_message VALUES(?,?,?,?,DATETIME('now','+8 hour'))", [null, from_userid, to_userid, message], function (err, row) {
+    db.get("SELECT user_message.*,users.username,users.portrait ,users.name FROM user_message,users WHERE user_message.rowid = ? AND users.id = ?", [this.lastID, from_userid], function (err, row) {
+      callback(row);
+    })
   });
 }
 
 function getMessageOfSession(from_userid, to_userid, callback) {
-  db.all("SELECT * FROM user_message where from_userid = ? AND to_userid = ?", [from_userid, to_userid], function (err, row) {
-    callback(row);
-  });
+  db.all("SELECT user_message.*,users.username,users.portrait ,users.name FROM user_message,users where user_message.from_userid = ? AND user_message.to_userid = ? AND users.id = ? " +
+    "or user_message.from_userid = ? AND user_message.to_userid = ? AND users.id = ? ORDER BY user_message.time ASC;",
+    [from_userid, to_userid, from_userid, to_userid, from_userid, to_userid], function (err, row) {
+      callback(row);
+    });
 }
 
 function confirmUserExists(username, callback) {
