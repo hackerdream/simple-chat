@@ -105,9 +105,9 @@ function testGetUser(next) {
 }
 
 function testSearchUser(next) {
-  db.searchUser('hello', function (rows) {
-    assertTrue(rows instanceof Array);
-    [].forEach.call(rows, function (user) {
+  db.searchUser('hello', function (users) {
+    assertTrue(users instanceof Array);
+    [].forEach.call(users, function (user) {
       assertTrue(user.password == undefined);
     });
 
@@ -115,5 +115,12 @@ function testSearchUser(next) {
   })
 }
 
+function testSearchUserByUsername(next) {
+  db.searchUserByUsername('admin', function (user) {
+    assertTrue(user instanceof Object);
+    assertTrue(user.password == undefined);
+  })
+}
+
 chain([createDatabase, testUserInsert, testAddFriend, testInsertMessage,
-  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser, testSearchUser]);
+  testGetMessage, testGetFriends, testGetUserByLogin, testGetUser, testSearchUser, testSearchUserByUsername]);
