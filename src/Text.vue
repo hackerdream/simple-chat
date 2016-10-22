@@ -1,6 +1,7 @@
 <template>
     <div style="flex: 0 0 30%;">
-        <textarea placeholder="按 Ctrl + Enter 发送" @keyup="onKeyup" v-model="content">
+        <textarea placeholder="按 Ctrl + Enter 发送" @keyup="onKeyup" v-model="content" autofocus autocomplete="off"
+                  autocorrect="off">
 
         </textarea>
     </div>
@@ -16,8 +17,6 @@
     }
 </style>
 <script>
-    import store from './store'
-
     export default{
         data () {
             return {
@@ -35,6 +34,7 @@
         methods: {
             onKeyup (e) {
                 if (e.ctrlKey && e.keyCode === 13 && this.content.length) {
+                    this.content = this.content.replace(/\n|\r\n/g, "<br/>");
                     this.$http.post('/message/' + this.id, JSON.stringify({message: this.content})).then(function (resp) {
                         this.$dispatch('add-message', resp.data);
                         this.content = '';

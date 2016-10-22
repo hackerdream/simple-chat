@@ -55,25 +55,32 @@
         ready(){
             this.$http.get('/getUser').then(function (resp) {
                 store.addUser(resp.data);
-            })
+            });
         },
         data(){
             return {
                 users: store.getUser(),
-                content: ''
+                content: '',
             }
         },
         methods: {
             onKeyup(e){
                 if (e.ctrlKey && e.keyCode === 13 && this.content.length) {
                     console.log('run');
+                    var that = this;
                     this.$http.get('/searchUser?name=' + this.content)
                             .then(function (resp) {
-                                console.log(resp.data);
+                                that.$dispatch('get-search', resp.data);
                             }, function (err) {
                                 console.log(err);
                             })
                 }
+            }
+        },
+        events: {
+            'clear-content': function () {
+                var that = this;
+                that.content = ''
             }
         }
     }

@@ -1,9 +1,10 @@
 <template>
     <div style="flex: 1;" class="list">
         <ul>
-            <li v-for="friend in friends" :class="{ active: friend.id === currentId }" @click="setSign(friend.id)">
+            <li v-for="friend in friends" :class="{ active: friend.id === currentId }"
+                @click="setSign(friend)">
                 <img class="avatar" width="30" height="30" :alt="friend.name">
-                <p class="name">{{friend.name}}</p>
+                <p class="name">{{friend.id,friend.name}}</p>
             </li>
         </ul>
     </div>
@@ -50,27 +51,71 @@
     export default{
         ready(){
             this.$http.get('/friend').then(function (resp) {
-                store.addFriendToFriends(resp.data);
+                var that = this;
+                [].forEach.call(resp.data, function (item) {
+                    that.friends.push(item);
+                    that.storeFriendsList.push(item);
+                })
             })
         },
         data(){
             return {
-                friends: store.getFriends(),
+                friends: [],
+                storeFriendsList: [],
                 currentId: null
             }
         },
         methods: {
-            setSign(id){
-                this.currentId = id;
-                for (var i = 0; i < this.friends.length; i++) {
-                    this.friends[i].selection = false;
-                }
-                for (i = 0; i < this.friends.length; i++) {
-                    if (this.friends[i].id === id) {
-
-                        this.$dispatch('get-friend-id', this.friends[i].id);
+            setSign(friend){
+                var index = 0;
+                for (var k = 0; k < this.storeFriendsList.length; k++) {
+                    if (this.storeFriendsList[k].username == friend.username) {
+                        index = 1;
                         break;
                     }
+                }
+                if (index == 1) {
+                    this.currentId = friend.id;
+                    for (var i = 0; i < this.friends.length; i++) {
+                        this.friends[i].selection = false;
+                    }
+                    for (i = 0; i < this.friends.length; i++) {
+                        if (this.friends[i].id === friend.id) {
+
+                            this.$dispatch('get-friend-id', this.friends[i].id);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    this.$dispatch('add-friend', friend)
+                }
+            }
+        },
+        events: {
+            'add-search': function (search) {
+                var that = this;
+                that.friends.splice(0, that.friends.length);
+                [].forEach.call(search, function (item) {
+                    that.friends.push(item);
+                });
+            },
+            'return-friends-list': function (data) {
+                var that = this;
+                if (data != null) {
+                    that.storeFriendsList.push(data);
+                    that.friends.splice(0, that.friends.length);
+                    [].forEach.call(that.storeFriendsList, function (item) {
+                        that.friends.push(item);
+                    });
+                    that.$dispatch('clear-content');
+                }
+                else {
+                    that.friends.splice(0, that.friends.length);
+                    [].forEach.call(that.storeFriendsList, function (item) {
+                        that.friends.push(item);
+                    });
+                    that.$dispatch('clear-content');
                 }
             }
         }

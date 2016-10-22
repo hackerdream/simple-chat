@@ -60,7 +60,7 @@
         ready(){
             var that = this;
             this.$http.get('/getUser').then(function (resp) {
-                that.$broadcast('checkUser', resp.data.username);
+                that.$broadcast('check-user', resp.data.username);
             })
         },
         components: {
@@ -72,6 +72,18 @@
             },
             'add-message': function (message) {
                 this.$broadcast('get-message', message);
+            },
+            'get-search': function (search) {
+                this.$broadcast('add-search', search)
+            },
+            'add-friend': function (friend) {
+                this.$broadcast('friend', friend);
+            },
+            'return-friends-list': function (data) {
+                this.$broadcast('return-friends-list', data);
+            },
+            'clear-content': function () {
+                this.$broadcast('clear-content');
             }
         }
     }
