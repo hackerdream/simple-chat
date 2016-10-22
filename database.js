@@ -55,7 +55,7 @@ function addFriend(from_userid, to_userid, callback) {
     if (result == undefined) {
       db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, to_userid, from_userid], function (err, row) {
         db.run("INSERT INTO user_friends VALUES(?,?,?)", [null, from_userid, to_userid], function (err, row) {
-          db.get("SELECT * FROM user_friends WHERE rowid = " + this.lastID, function (err, row) {
+          db.get("SELECT name,username,id,portrait FROM users WHERE id in (SELECT to_userid FROM user_friends WHERE  rowid = ?);", this.lastID, function (err, row) {
             callback(true, row);
           });
         });
@@ -67,7 +67,13 @@ function addFriend(from_userid, to_userid, callback) {
 }
 
 function searchUser(name, callback) {
-  db.all("SELECT username,name,portrait FROM users WHERE name = ?", [name], function (err, row) {
+  db.all("SELECT username,name,id,portrait FROM users WHERE name = ?", [name], function (err, row) {
+    callback(row);
+  })
+}
+
+function searchUserByUsername(username, callback) {
+  db.get("SELECT username,name,id,portrait FROM users WHERE username = ?", [username], function (err, row) {
     callback(row);
   })
 }
@@ -116,3 +122,4 @@ exports.getUser = getUser;
 exports.insertMessage = insertMessage;
 exports.getMessageOfSession = getMessageOfSession;
 exports.searchUser = searchUser;
+exports.searchUserByUsername = searchUserByUsername;
