@@ -34,5 +34,5 @@ app.use(login);
 app.use(chat);
 
 app.listen(8000, function () {
-  console.log("http://localhost:3000");
+  console.log("http://localhost:8000");
 });
