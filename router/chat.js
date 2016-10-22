@@ -44,14 +44,16 @@ chat.get('/searchUser', function (req, res) {
 });
 
 chat.post('/friend', function (req, res) {
-  db.addFriend(req.session.userid, req.body.to_userid, function (success, frined) {
-    if (success) {
-      res.send(frined);
-    } else {
-      res.status(409).send({
-        message: "you have this friend already."
-      });
-    }
+  db.searchUserByUsername(req.body.username, function (user) {
+    db.addFriend(req.session.userid, user.id, function (success, friend) {
+      if (success) {
+        res.send(friend);
+      } else {
+        res.status(409).send({
+          message: "you have this friend already."
+        });
+      }
+    });
   });
 });
 
