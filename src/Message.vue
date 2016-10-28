@@ -191,11 +191,13 @@
                 document.getElementById('friend-message').style.display = 'block';
             },
             'get-data': function (item) {
-                this.messages.push({
-                    message: item.content,
-                    time: item.time,
-                    username: item.username
-                })
+                if (item.friend_id == this.friendId) {
+                    this.messages.push({
+                        message: item.content,
+                        time: item.time,
+                        username: item.username
+                    })
+                }
             }
         },
         methods: {
