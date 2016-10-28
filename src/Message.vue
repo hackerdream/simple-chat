@@ -141,22 +141,22 @@
 <script>
 
     export default{
-        ready(){
-            var getFriends = function (id) {
-                this.$http.get('/message/' + id).then(function (resp) {
-                    this.messages.splice(0, this.messages.length);
-                    [].forEach.call(resp.data, function (item) {
-                        var blackIndex = item.time.lastIndexOf(' ');
-                        item.time = item.time.substring(blackIndex);
-                        this.messages.push(item);
-                    }.bind(this))
-                });
-            }.bind(this);
-
-            setInterval(function () {
-                getFriends(this.friendId);
-            }.bind(this), 100000);
-        },
+//        ready(){
+//            var getFriends = function (id) {
+//                this.$http.get('/message/' + id).then(function (resp) {
+//                    this.messages.splice(0, this.messages.length);
+//                    [].forEach.call(resp.data, function (item) {
+//                        var blackIndex = item.time.lastIndexOf(' ');
+//                        item.time = item.time.substring(blackIndex);
+//                        this.messages.push(item);
+//                    }.bind(this))
+//                });
+//            }.bind(this);
+//
+//            setInterval(function () {
+//                getFriends(this.friendId);
+//            }.bind(this), 100000);
+//        },
         data(){
             return {
                 messages: [],
@@ -189,6 +189,13 @@
                 this.currentUser = friend.username;
                 this.currentName = friend.name;
                 document.getElementById('friend-message').style.display = 'block';
+            },
+            'get-data': function (item) {
+                this.messages.push({
+                    message: item.content,
+                    time: item.time,
+                    username: item.username
+                })
             }
         },
         methods: {

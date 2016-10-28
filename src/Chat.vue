@@ -55,13 +55,18 @@
     import Text from './Text.vue'
     import store from './store'
 
+    var socket = io('http://localhost:8000');
 
     export default{
         ready(){
             var that = this;
             this.$http.get('/getUser').then(function (resp) {
                 that.$broadcast('check-user', resp.data.username);
-            })
+                that.$broadcast('broadcast-user-id', resp.data.id);
+            });
+            socket.on('get-data', function (data) {
+                that.$broadcast('get-data', data);
+            });
         },
         components: {
             User, List, Message, Text
@@ -84,6 +89,9 @@
             },
             'clear-content': function () {
                 this.$broadcast('clear-content');
+            },
+            'broadcast-data': function (data) {
+                socket.emit('broadcast-data', data);
             }
         }
     }

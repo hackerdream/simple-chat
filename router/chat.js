@@ -2,6 +2,19 @@ var express = require('express');
 var chat = express.Router();
 var db = require('../database');
 
+var io = require('../app').io;
+
+io.on('connection', function (socket) {
+  socket.on('broadcast-data', function (data) {
+    db.getUser(data.user_id, function (user) {
+      db.insertMessage(data.user_id, data.friend_id, data.content, function (message) {
+        socket.emit('get-data', data)
+      });
+    });
+  });
+});
+
+
 chat.use(function (req, res, next) {
   if (req.session.username && req.session.userid) {
     next();
@@ -21,12 +34,6 @@ chat.get('/getUser', function (req, res) {
 
 chat.get('/message/:id', function (req, res) {
   db.getMessageOfSession(req.session.userid, req.params.id, function (message) {
-    res.send(message);
-  });
-});
-
-chat.post('/message/:id', function (req, res) {
-  db.insertMessage(req.session.userid, req.params.id, req.body.message, function (message) {
     res.send(message);
   });
 });

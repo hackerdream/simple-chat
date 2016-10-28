@@ -3,8 +3,13 @@ var ejs = require('ejs');
 var path = require('path');
 var session = require('express-session');
 var bodyParser = require('body-parser');
-
 var app = express();
+
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
+exports.io = io;
+
 var login = require('./router/login');
 var chat = require('./router/chat');
 
@@ -33,6 +38,6 @@ app.use(bodyParser.urlencoded({
 app.use(login);
 app.use(chat);
 
-app.listen(8000, function () {
+server.listen(8000, function () {
   console.log("http://localhost:8000");
 });
