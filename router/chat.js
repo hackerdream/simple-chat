@@ -4,11 +4,19 @@ var db = require('../database');
 
 var io = require('../app').io;
 
+var userSockets = {};
+
 io.on('connection', function (socket) {
+
+  socket.on('bind', function (data) {
+    var userId = data.uid;
+    userSockets[userId] = socket;
+  });
+
   socket.on('broadcast-data', function (data) {
     db.getUser(data.user_id, function (user) {
       db.insertMessage(data.user_id, data.friend_id, data.content, function (message) {
-        socket.emit('get-data', data)
+        userSockets[data.friend_id].emit('get-data', data)
       });
     });
   });

@@ -27,8 +27,8 @@
         flex: 0 0 70%;;
         border-bottom: 1px solid #CCCCCC;
         padding: 10px 15px;
-        overflow-y: scroll;
         position: relative;
+        overflow: auto;
     }
 
     ul {
@@ -139,9 +139,8 @@
     }
 </style>
 <script>
-
     export default{
-//        ready(){
+        ready(){
 //            var getFriends = function (id) {
 //                this.$http.get('/message/' + id).then(function (resp) {
 //                    this.messages.splice(0, this.messages.length);
@@ -156,7 +155,7 @@
 //            setInterval(function () {
 //                getFriends(this.friendId);
 //            }.bind(this), 100000);
-//        },
+        },
         data(){
             return {
                 messages: [],
@@ -175,6 +174,7 @@
                         var blackIndex = item.time.lastIndexOf(' ');
                         item.time = item.time.substring(blackIndex);
                         this.messages.push(item);
+                        this.scrollBottom();
                     }.bind(this))
                 });
             },
@@ -191,16 +191,30 @@
                 document.getElementById('friend-message').style.display = 'block';
             },
             'get-data': function (item) {
-                if (item.friend_id == this.friendId) {
+                if (item.user_id == this.friendId) {
                     this.messages.push({
                         message: item.content,
                         time: item.time,
                         username: item.username
-                    })
+                    });
+                    this.scrollBottom();
+                }
+                if (item.username == this.user) {
+                    this.messages.push({
+                        message: item.content,
+                        time: item.time,
+                        username: item.username
+                    });
+                    this.scrollBottom();
                 }
             }
         },
         methods: {
+            scrollBottom(){
+                window.setTimeout(function () {
+                    document.getElementsByClassName('message')[0].scrollTop = document.getElementsByClassName('message')[0].scrollHeight;
+                }, 50);
+            },
             returnFriends(){
                 this.$dispatch('return-friends-list', null);
                 document.getElementById('friend-message').style.display = 'none';

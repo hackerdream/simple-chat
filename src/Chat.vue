@@ -63,10 +63,11 @@
             this.$http.get('/getUser').then(function (resp) {
                 that.$broadcast('check-user', resp.data.username);
                 that.$broadcast('broadcast-user-id', resp.data.id);
+                socket.emit('bind', {uid: resp.data.id});
             });
             socket.on('get-data', function (data) {
                 that.$broadcast('get-data', data);
-            });
+            })
         },
         components: {
             User, List, Message, Text
@@ -92,6 +93,7 @@
             },
             'broadcast-data': function (data) {
                 socket.emit('broadcast-data', data);
+                this.$broadcast('get-data', data);
             }
         }
     }
